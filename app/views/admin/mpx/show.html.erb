@@ -1,0 +1,60 @@
+<% render :partial => 'admin/shared/order_sub_menu' %>
+
+<h1><%= t("MPX Exporting") %></h1>
+
+<%
+  if params[:start_date]
+    s = params[:start_date]
+    @start_date = Time.new( s['year'], s['month'], s['day'], s['hour'], s['minute'] )
+  else
+    @start_date = Time.parse( 'Yesterday at 3:01pm' )
+  end
+  
+  if params[:end_date]
+    e = params[:end_date]
+    @end_date = Time.new( e['year'], e['month'], e['day'], e['hour'], e['minute'] )
+  else
+    @end_date = Time.parse( 'Yesterday at 3:01pm' )
+  end
+%>
+
+<% form_tag '/admin/mpx/export' do %>
+  <table>
+    <tr>
+      <th><%= label_tag 'Start' %></th>
+      <td>
+        <%= select_datetime @start_date, :prefix => :start_date %>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        <%= label_tag 'End' %>
+      </th>
+      <td>
+        <%= select_datetime @end_date, :prefix => :end_date %>
+      </td>
+    </tr>
+    <tr>
+      <th>Reprocess</th>
+      <td>
+        <%= check_box_tag 'reprocess' %>
+      </td>
+    </tr>
+    <tr>
+      <th>Email</th>
+      <td>
+        <%= text_field_tag 'email' %>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <%= submit_tag 'Export' %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+<pre>
+<%= @test_output if @test_output %>
+</pre>
