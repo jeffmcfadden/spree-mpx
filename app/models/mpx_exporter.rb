@@ -1,3 +1,5 @@
+require 'zip/zip'
+
 class MpxExporter
 
   attr_accessor :errors
@@ -25,15 +27,6 @@ class MpxExporter
     #// Update MPX flag
     #updateMPXProcessed($startDate, $endDate);
     
-    @test_data =  donor_account_data        + "\n"
-    @test_data += donor_email_data          + "\n"
-    @test_data += gift_master_data          + "\n"
-    @test_data += gift_detail_data          + "\n"
-    @test_data += order_master_data         + "\n"
-    @test_data += order_detail_data         + "\n"
-
-    @errors += ["Something went wrong"] #test
-    return @test_data
   end
 
   def donor_account_data
