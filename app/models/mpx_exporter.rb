@@ -12,21 +12,7 @@ class MpxExporter
   end
 
   def export
-    #// Generate reports
-    #getDonorAccountData($startDate, $endDate, $reprocess);
-    #getDonorEmailAddressData($startDate, $endDate, $reprocess);
-    #getGiftMasterData($startDate, $endDate, $reprocess);
-    #getGiftDetailData($startDate, $endDate, $reprocess);
-    #getOrderMasterData($startDate, $endDate, $reprocess);
-    #getOrderDetailData($startDate, $endDate, $reprocess);
-    #// //	getAttendeeDetailData($startDate, $endDate, $reprocess);
-    
-    #// Zip reports
-    #zipFiles();
-    
-    #// Update MPX flag
-    #updateMPXProcessed($startDate, $endDate);
-    
+    #Doing this from the controller now.
   end
 
   def donor_account_data

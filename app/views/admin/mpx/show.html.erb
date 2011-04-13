@@ -14,7 +14,7 @@
     e = params[:end_date]
     @end_date = Time.new( e['year'], e['month'], e['day'], e['hour'], e['minute'] )
   else
-    @end_date = Time.parse( 'Yesterday at 3:01pm' )
+    @end_date = Time.parse( 'Today at 3:01pm' )
   end
 %>
 
