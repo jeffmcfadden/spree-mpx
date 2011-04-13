@@ -6,9 +6,16 @@ class MpxExporter
 
   def initialize( params )#start_date, end_date, reprocess = false )
     @errors = []
-    #@start_date = start_date
-    #@end_date   = end_date
-    #@reprocess  = reprocess
+    
+    sd = params[:start_date]
+    @start_date = Time.new( sd[:year], sd[:month], sd[:day], sd[:hour], sd[:minute] )
+    
+    ed = params[:end_date]
+    @end_date   = Time.new( ed[:year], ed[:month], ed[:day], ed[:hour], ed[:minute] )
+    
+    @reprocess  = params[:reprocess]
+
+    @records = Order.complete.where( [ 'completed_at >= ? AND completed_at <= ?', @start_date, @end_date ] )
   end
 
   def export
@@ -16,8 +23,6 @@ class MpxExporter
   end
 
   def donor_account_data
-    #TODO: Scope this properly
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "cstAcctNbr", "lnkAcctNbr", "DonorTitleName", "DonorFirstName", "DonorMI", "DonorLastName", "DonorSuffix", "SpouseFirstName", "OrganizationName", "AddressLines", "City", "State", "Zip", "County", "Country", "cstAddDate", "cstUserID", "cstSourceCode" ]
@@ -128,8 +133,6 @@ class MpxExporter
   end
 
   def donor_email_data
-    #TODO: Scope this properly
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkAcctNbr", "EmailCategory", "EmailAddress" ]
@@ -158,8 +161,6 @@ class MpxExporter
   end
 
   def gift_master_data
-    #TODO: Scope this
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkGiftRef", "lnkAcctNbr", "cstGiftRef", "GiftDate", "PayMethodCode", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "ReceiptNumber", "CurrencyCode", "MediaCode", "Comment", "GiftAmt", "MotivationCode", "FundID", "PledgeCode", "Deductible", "Anonymous", "BatchType", "payment_method" ]
@@ -224,8 +225,6 @@ class MpxExporter
   end
 
   def gift_detail_data
-    #TODO: Scope this:
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkGiftRef", "GiftAmt", "MotivationCode", "FundID", "PledgeCode", "Deductible", "Anonymous" ]
@@ -267,8 +266,6 @@ class MpxExporter
   end
 
   def order_master_data
-    #TODO: Scope this
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCounty", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
@@ -378,8 +375,6 @@ class MpxExporter
   end
 
   def order_detail_data
-    #TODO: Scope this
-    @records = Order.complete
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkOrdRef", "ProdCode", "PriceCode", "Price", "PurQty", "FreeQty", "Tax", "SecondTax", "Taxable", "code_override" ]
