@@ -22,6 +22,19 @@ class MpxExporter
     #Doing this from the controller now.
   end
 
+  def self.map_payment_type( new )
+    case new
+      when 'Check'
+        'Check'
+      when 'Cash'
+        'Cash'
+      when 'Other'
+        'Other'
+      when 'Creditcard'
+        'Credit Card'
+    end
+  end
+
   def donor_account_data
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
@@ -41,11 +54,11 @@ class MpxExporter
           record.bill_address.organization,
           record.bill_address.address1 + "<BR>" + record.bill_address.address2,
           record.bill_address.city,
-          record.bill_address.state.name,
+          record.bill_address.state.abbr,
           record.bill_address.zipcode,
           '',                                                                             # Always ''
           record.bill_address.country.name,
-          record.completed_at,
+          record.completed_at.strftime( "%Y-%m-%d %k:%M:%S" ),
           '',                                                                             # Always ''
           ''                                                                              # Always ''
         ]
@@ -166,31 +179,32 @@ class MpxExporter
       csv << [ "lnkGiftRef", "lnkAcctNbr", "cstGiftRef", "GiftDate", "PayMethodCode", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "ReceiptNumber", "CurrencyCode", "MediaCode", "Comment", "GiftAmt", "MotivationCode", "FundID", "PledgeCode", "Deductible", "Anonymous", "BatchType", "payment_method" ]
 
       @records.each do |record|
-        csv << [
-          record.number,
-          ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
-          '',                                                                                        # Always ''
-          record.completed_at,
-          'Web Authorized',                                                                          # Always 'Web Authorized'
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          'USD',                                                                                     # Always 'USD'
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          0, #TODO: gift_amount,
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          '',                                                                                        # Always ''
-          #TODO: This probably needs some tweaking:
-          '' #record.payments.first.source_type
-        ]
+        if record.line_items.any? { |line_item| line_item.variant.product.is_donation? }
+          csv << [
+            record.number,
+            ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
+            '',                                                                                        # Always ''
+            record.completed_at.strftime( "%Y-%m-%d %k:%M:%S" ),
+            'Web Authorized',                                                                          # Always 'Web Authorized'
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            'USD',                                                                                     # Always 'USD'
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            record.total.to_f, 
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            '',                                                                                        # Always ''
+            ( record.payments.first ? MpxExporter.map_payment_type( record.payments.first.source_type ) : '' )
+          ]
+        end
       end
     end
    
@@ -236,15 +250,17 @@ class MpxExporter
       
       @records.each do |order|
         order.line_items.each do |record|
-          csv << [
-            order.number,
-            record.price,
-            'WM',
-            record.variant.sku,                                                                        # Code
-            '',                                                                                        # Always ''
-            '',                                                                                        # Always ''
-            ''                                                                                         # Always ''
-          ]
+          if record.variant.product.is_donation?
+            csv << [
+              order.number,
+              record.price,
+              'WM',
+              record.variant.sku,                                                                        # Code
+              '',                                                                                        # Always ''
+              '',                                                                                        # Always ''
+              ''                                                                                         # Always ''
+            ]
+          end
         end
       end
     end
@@ -274,10 +290,9 @@ class MpxExporter
         csv << [
           record.number,
           ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
-          record.completed_at,
+          record.completed_at.strftime( "%Y-%m-%d %k:%M:%S" ),
           "Web Authorized", 
-          #TODO: This probably needs some tweaking:
-          '', #record.payments.first.source_type,
+          ( record.payments.first ? MpxExporter.map_payment_type( record.payments.first.source_type ) : '' ),
           '',                                                                                        # Always ''
           '',                                                                                        # Always ''
           '',                                                                                        # Always ''
@@ -286,8 +301,8 @@ class MpxExporter
           'USD',                                                                                     # Always 'USD'
           '',                                                                                        # Always ''
           'WM',                                                                                      # Always 'WM'
-          "TODO: PurchaseLocation", 
-          "TODO: FreeLocation", 
+          "02", 
+          "02", 
           "", 
           record.total,                                                                              # "TotalFunds", 
           record.credit_total,                                                                       # "TotalDiscounts", 
@@ -297,12 +312,12 @@ class MpxExporter
           record.ship_address.full_name, #"Ship_Name", 
           record.ship_address.address1 + "<BR>" + record.ship_address.address2, #"Ship_AddressLines", 
           record.ship_address.city, #"Ship_City", 
-          record.ship_address.state.name, #"Ship_State", 
+          record.ship_address.state.abbr, #"Ship_State", 
           record.ship_address.zipcode, #"Ship_Zip", 
-          '', #"ShipCounty", 
+          record.ship_address.country.name, #"", 
           '', #TODO: Add this: record.shipments.first.shipping_method.mpx_code, #"ShipperCode", 
           '', #"BatchType", 
-          'WM', # TODO: Is this right? "GiftMotvCode", 
+          'WM', # "GiftMotvCode", 
           '', #"GiftPledgeCode",
           '' #TODO: This is supposed to be the mpx code of the first donation in the order only.. So weird.
         ]
@@ -390,7 +405,7 @@ class MpxExporter
             '',
             0, 
             0, 
-            0, #TODO: Taxable
+            ( line_item.variant.product.tax_category && line_item.variant.product.tax_category.name == 'Taxable Goods' ? '1' : '0' ),
             line_item.variant.sku # We shouldn't need a code override anymore since we have variants.
           ]
         end
