@@ -35,6 +35,25 @@ class MpxExporter
     end
   end
 
+  def self.map_shipping_mpx_code( name )
+    shipping_codes_map = {
+      'USPS First Mail International (2 to 3 weeks)'    => 'FI',
+      'USPS Global Express Guaranteed (2 to 3 weeks)'   => 'E',
+      'USPS Priority Mail International (2 to 3 weeks)' => 'I',
+      'USPS First-Class Mail'                           => 'F',
+      'USPS Priority Mail (3 to 5 business days)'       => 'P',
+      'USPS Library Mail (5 to 14 business days)'       => 'L',
+      'UPS Ground (3 to 7 business days)'               => 'G',
+      'UPS Three Day Select (4 to 5 business days)'     => '3',
+      'UPS Second Day Air (3 to 4 business days)'       => '2',
+      'UPS Next Day Air (2 to 3 business days)'         => 'N'
+    }
+ 
+    #Return name if no match because that should, in theory, let the user who is
+    #importing to mpx choose from the options that are in mpx to match it there
+    shipping_codes_map[name] || name
+  end
+
   def donor_account_data
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
@@ -307,18 +326,18 @@ class MpxExporter
           record.total,                                                                              # "TotalFunds", 
           record.credit_total,                                                                       # "TotalDiscounts", 
           record.ship_total,                                                                         # "ShipperTotal", 
-          0, #TODO: record.coupon_total,                                                                       # TODO: Supposed to be coupons only. "Discount", 
+          0, #TODO: record.coupon_total,                                                             # TODO: Supposed to be coupons only. "Discount", 
           record.tax_total,                                                                          # "OrderTax", 
-          record.ship_address.full_name, #"Ship_Name", 
-          record.ship_address.address1 + "<BR>" + record.ship_address.address2, #"Ship_AddressLines", 
-          record.ship_address.city, #"Ship_City", 
-          record.ship_address.state.abbr, #"Ship_State", 
-          record.ship_address.zipcode, #"Ship_Zip", 
-          record.ship_address.country.name, #"", 
-          '', #TODO: Add this: record.shipments.first.shipping_method.mpx_code, #"ShipperCode", 
-          '', #"BatchType", 
-          'WM', # "GiftMotvCode", 
-          '', #"GiftPledgeCode",
+          record.ship_address.full_name,                                                             #"Ship_Name", 
+          record.ship_address.address1 + "<BR>" + record.ship_address.address2,                      #"Ship_AddressLines", 
+          record.ship_address.city,                                                                  #"Ship_City", 
+          record.ship_address.state.abbr,                                                            #"Ship_State", 
+          record.ship_address.zipcode,                                                               #"Ship_Zip", 
+          record.ship_address.country.name,                                                          #"", 
+          ( record.shipments.first ? MpxExporter.map_shipping_mpx_code( record.shipments.first.shipping_method.name ) : '' ),          #"ShipperCode", 
+          '',                                                                                        #"BatchType", 
+          'WM',                                                                                      # "GiftMotvCode", 
+          '',                                                                                        #"GiftPledgeCode",
           '' #TODO: This is supposed to be the mpx code of the first donation in the order only.. So weird.
         ]
       end
