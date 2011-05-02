@@ -331,7 +331,7 @@ class MpxExporter
           record.total,                                                                              # "TotalFunds", 
           record.credit_total,                                                                       # "TotalDiscounts", 
           record.ship_total,                                                                         # "ShipperTotal", 
-          0, #TODO: record.coupon_total,                                                             # TODO: Supposed to be coupons only. "Discount", 
+          record.discount_total,                                                                     # Supposed to be coupons only. "Discount", 
           record.tax_total,                                                                          # "OrderTax", 
           record.ship_address.full_name,                                                             #"Ship_Name", 
           record.ship_address.address1 + "<BR>" + record.ship_address.address2,                      #"Ship_AddressLines", 
