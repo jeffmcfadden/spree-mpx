@@ -306,9 +306,10 @@ class MpxExporter
       csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCounty", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
 
       @records.each do |record|
-
+        next if record.line_items.count == 0
+        
         #mpx wants the code of the first donation in the order.
-        line_item = record.line_items.find { |i| i.variant.product.is_donation? }
+        line_item = record.line_items.detect { |i| i.variant.product.is_donation? }
         first_donation_code = ( line_item && line_item.variant ) ? line_item.variant.sku : ''
 
         csv << [

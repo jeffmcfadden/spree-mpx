@@ -7,14 +7,14 @@
     s = params[:start_date]
     @start_date = Time.new( s['year'], s['month'], s['day'], s['hour'], s['minute'] )
   else
-    @start_date = Time.parse( 'Yesterday at 3:01pm' )
+    @start_date = Time.parse( '3:01pm' ) - 24.hours
   end
   
   if params[:end_date]
     e = params[:end_date]
     @end_date = Time.new( e['year'], e['month'], e['day'], e['hour'], e['minute'] )
   else
-    @end_date = Time.parse( 'Today at 3:00pm' )
+    @end_date = Time.parse( '3:00pm' )
   end
 %>
 
