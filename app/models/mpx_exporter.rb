@@ -1,4 +1,5 @@
 require 'zip/zip'
+require 'csv'
 
 class MpxExporter
 
@@ -73,7 +74,7 @@ class MpxExporter
           record.bill_address.organization,
           record.bill_address.address1 + "<BR>" + record.bill_address.address2,
           record.bill_address.city,
-          record.bill_address.state.abbr,
+          ( record.bill_address.state ? record.bill_address.state.abbr : record.bill_address.state_name ),
           record.bill_address.zipcode,
           '',                                                                             # Always ''
           record.bill_address.country.name,
@@ -337,7 +338,7 @@ class MpxExporter
           record.ship_address.full_name,                                                             #"Ship_Name", 
           record.ship_address.address1 + "<BR>" + record.ship_address.address2,                      #"Ship_AddressLines", 
           record.ship_address.city,                                                                  #"Ship_City", 
-          record.ship_address.state.abbr,                                                            #"Ship_State", 
+          ( record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name ),                                                            #"Ship_State", 
           record.ship_address.zipcode,                                                               #"Ship_Zip", 
           record.ship_address.country.name,                                                          #"", 
           ( record.shipments.first ? MpxExporter.map_shipping_mpx_code( record.shipments.first.shipping_method.name ) : '' ),          #"ShipperCode", 

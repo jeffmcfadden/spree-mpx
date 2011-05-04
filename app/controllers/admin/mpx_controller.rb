@@ -9,8 +9,9 @@ class Admin::MpxController < Admin::BaseController
   def export
     e = MpxExporter.new(params)
 
-    file_name = "mpx_export_#{Time.now}.zip"
-    t = Tempfile.new("mpx_export_#{Time.now}")
+    file_name = "mpx_export_#{Time.now.strftime( '%Y%m%d%k%M%S' )}.zip"
+    t = Tempfile.new("mpx_export_#{Time.now.strftime( '%Y%m%d%k%M%S' )}")
+
     Zip::ZipOutputStream.open(t.path) do |z|
       [:donor_account_data, :donor_email_data, :gift_master_data, :gift_detail_data, :order_master_data, :order_detail_data].each do |f|
         tf = Tempfile.new( f.to_s + '.csv' )
