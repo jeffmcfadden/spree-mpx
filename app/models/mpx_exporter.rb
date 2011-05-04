@@ -61,8 +61,9 @@ class MpxExporter
       csv << [ "cstAcctNbr", "lnkAcctNbr", "DonorTitleName", "DonorFirstName", "DonorMI", "DonorLastName", "DonorSuffix", "SpouseFirstName", "OrganizationName", "AddressLines", "City", "State", "Zip", "County", "Country", "cstAddDate", "cstUserID", "cstSourceCode" ]
       
 
+      deduped_records = {}
       @records.each do |record|
-        csv << [
+        this_row = [
           '',                                                                             # Always ''
           ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
           '',                                                                             # Always ''
@@ -82,7 +83,12 @@ class MpxExporter
           '',                                                                             # Always ''
           ''                                                                              # Always ''
         ]
+
+        #Force unique on lnkAcctNbr
+        deduped_records[this_row[1]] = this_row
       end
+
+      csv << deduped_records.values
     end
    
     puts csv_string
@@ -307,7 +313,7 @@ class MpxExporter
       csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCounty", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
 
       @records.each do |record|
-        next if record.line_items.count == 0
+        next if record.line_items.count == 0 || record.line_items.none? { |line_item| line_item.variant.product.is_donation? }
         
         #mpx wants the code of the first donation in the order.
         line_item = record.line_items.detect { |i| i.variant.product.is_donation? }
@@ -418,10 +424,12 @@ class MpxExporter
   def order_detail_data
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
-      csv << [ "lnkOrdRef", "ProdCode", "PriceCode", "Price", "PurQty", "FreeQty", "Tax", "SecondTax", "Taxable", "code_override" ]
+      csv << [ "lnkOrdRef", "ProdCode", "PriceCode", "Price", "PurQty", "FreeQty", "Tax", "SecondTax", "Taxable" ]
 
       @records.each do |order|
         order.line_items.each do |line_item|
+          #Only non-donation items here
+          next if line_item.variant.product.is_donation?
           csv << [
             order.number,
             line_item.variant.sku,
@@ -432,7 +440,6 @@ class MpxExporter
             0, 
             0, 
             ( line_item.variant.product.tax_category && line_item.variant.product.tax_category.name == 'Taxable Goods' ? '1' : '0' ),
-            line_item.variant.sku # We shouldn't need a code override anymore since we have variants.
           ]
         end
       end
