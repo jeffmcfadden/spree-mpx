@@ -88,7 +88,9 @@ class MpxExporter
         deduped_records[this_row[1]] = this_row
       end
 
-      csv << deduped_records.values
+      deduped_records.each do |i, r|
+        csv << r
+      end
     end
    
     puts csv_string
@@ -313,7 +315,8 @@ class MpxExporter
       csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCounty", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
 
       @records.each do |record|
-        next if record.line_items.count == 0 || record.line_items.none? { |line_item| line_item.variant.product.is_donation? }
+        #Skip if we have a record with no line items, or one that's only donation(s)
+        next if record.line_items.count == 0 || record.line_items.all? { |line_item| line_item.variant.product.is_donation? }
         
         #mpx wants the code of the first donation in the order.
         line_item = record.line_items.detect { |i| i.variant.product.is_donation? }
