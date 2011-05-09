@@ -207,7 +207,10 @@ class MpxExporter
       csv << [ "lnkGiftRef", "lnkAcctNbr", "cstGiftRef", "GiftDate", "PayMethodCode", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "ReceiptNumber", "CurrencyCode", "MediaCode", "Comment", "GiftAmt", "MotivationCode", "FundID", "PledgeCode", "Deductible", "Anonymous", "BatchType", "payment_method" ]
 
       @records.each do |record|
-        if record.line_items.any? { |line_item| line_item.variant.product.is_donation? }
+        if record.line_items.any? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
+
+          donations_total = record.line_items.inject(0) {|sum, i| ( i.variant.product.is_donation? ) ? ( sum + i.price ) : 0  }
+
           csv << [
             record.number,
             ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
@@ -223,7 +226,7 @@ class MpxExporter
             'USD',                                                                                     # Always 'USD'
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
-            record.total.to_f, 
+            donations_total.to_f, 
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
@@ -278,7 +281,7 @@ class MpxExporter
       
       @records.each do |order|
         order.line_items.each do |record|
-          if record.variant.product.is_donation?
+          if record.variant && record.variant.product.is_donation?
             csv << [
               order.number,
               record.price,
