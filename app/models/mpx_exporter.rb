@@ -229,7 +229,7 @@ class MpxExporter
             'USD',                                                                                     # Always 'USD'
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
-            '', #Used to be: donations_total.to_f, but based on the docs the detail export should hold this data, not the master, which overrides
+            donations_total.to_f,                     #but based on the docs the detail export should hold this data, not the master, which overrides
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
