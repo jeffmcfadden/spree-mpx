@@ -207,8 +207,11 @@ class MpxExporter
       csv << [ "lnkGiftRef", "lnkAcctNbr", "cstGiftRef", "GiftDate", "PayMethodCode", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "ReceiptNumber", "CurrencyCode", "MediaCode", "Comment", "GiftAmt", "MotivationCode", "FundID", "PledgeCode", "Deductible", "Anonymous", "BatchType", "payment_method" ]
 
       @records.each do |record|
-        if record.line_items.any? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
+        #We only process orders here where the entire order is made up of
+        #donations
+        if record.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
 
+          #This might be redundant now
           donations_total = record.line_items.inject(0) {|sum, i| ( i.variant.product.is_donation? ) ? ( sum + i.price ) : 0  }
 
           csv << [
@@ -226,7 +229,7 @@ class MpxExporter
             'USD',                                                                                     # Always 'USD'
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
-            donations_total.to_f, 
+            '', #Used to be: donations_total.to_f, but based on the docs the detail export should hold this data, not the master, which overrides
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
             '',                                                                                        # Always ''
@@ -280,17 +283,23 @@ class MpxExporter
     # :Anonymous        # Always ''
       
       @records.each do |order|
-        order.line_items.each do |record|
-          if record.variant && record.variant.product.is_donation?
-            csv << [
-              order.number,
-              record.price,
-              'WM',
-              record.variant.sku,                                                                        # Code
-              '',                                                                                        # Always ''
-              '',                                                                                        # Always ''
-              ''                                                                                         # Always ''
-            ]
+        #We only process orders here where the entire order is made up of
+        #donations
+        if order.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
+        
+          order.line_items.each do |record|
+            #This condition is probably redundant now
+            if record.variant && record.variant.product.is_donation?
+              csv << [
+                order.number,
+                record.price,
+                'WM',
+                record.variant.sku,                                                                        # Code
+                '',                                                                                        # Always ''
+                '',                                                                                        # Always ''
+                ''                                                                                         # Always ''
+              ]
+            end
           end
         end
       end
