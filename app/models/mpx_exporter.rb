@@ -444,12 +444,12 @@ class MpxExporter
       @records.each do |order|
         order.line_items.each do |line_item|
           #Only non-donation items here
-          next if line_item.variant.product.is_donation?
+          next if line_item.variant.product.is_donation? || line_item.quantity < 1
           csv << [
             order.number,
             line_item.variant.sku,
             'ST',
-            line_item.price,
+            sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ), #Changing because amount takes into account the volume discount. line_item.price,
             line_item.quantity,
             '',
             0, 
