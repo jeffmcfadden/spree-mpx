@@ -324,7 +324,7 @@ class MpxExporter
   def order_master_data
 
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
-      csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCounty", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
+      csv << [ "lnkOrdRef", "lnkAcctNbr", "OrderDate", "PayMethodCode", "payment_method", "CCType", "CCExpiry", "PayRefNum", "CCAuth", "CCAuthDate", "CurrencyCode", "MediaCode", "MotivationCode", "PurchaseLocation", "FreeLocation", "Comment", "TotalFunds", "TotalDiscounts", "ShipperTotal", "Discount", "OrderTax", "Ship_Name", "Ship_AddressLines", "Ship_City", "Ship_State", "Ship_Zip", "ShipCountry", "ShipperCode", "BatchType", "GiftMotvCode", "GiftPledgeCode", "GiftFundID" ]
 
       @records.each do |record|
         #Skip if we have a record with no line items, or one that's only donation(s)

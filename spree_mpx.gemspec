@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_mpx'
-  s.version     = '1.0.6'
+  s.version     = '1.0.7'
   s.summary     = 'Data export from spree to mpx'
   #s.description = 'Add (optional) gem description here'
   s.required_ruby_version = '>= 1.9.2'
