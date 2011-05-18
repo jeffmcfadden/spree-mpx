@@ -16,7 +16,7 @@ class MpxExporter
     
     @reprocess  = params[:reprocess]
 
-    @records = Order.complete.where( [ 'completed_at >= ? AND completed_at <= ?', @start_date, @end_date ] )
+    @records = Order.complete.where( [ 'completed_at >= ? AND completed_at < ?', @start_date, @end_date ] )
   end
 
   def export
