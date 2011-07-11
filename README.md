@@ -1,7 +1,7 @@
 SpreeMpx
 ===============
 
-Export to mpx from spree
+ Export to mpx from spree
 
 
 Installation
