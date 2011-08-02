@@ -15,7 +15,8 @@ class Admin::MpxController < Admin::BaseController
 
     Zip::ZipOutputStream.open(t.path) do |z|
       [:donor_account_data, :donor_email_data, :gift_master_data, :gift_detail_data, :order_master_data, :order_detail_data].each do |f|
-        tf = Tempfile.new( f.to_s + '.csv' )
+        filename = f.to_s.titleize.gsub(/ Data/, '').gsub(' ', '_').gsub('Email', 'EMailAddress') #Generates file names as requested
+        tf = Tempfile.new( filename + '.csv' )
         tf.write( e.send( f ) )
         tf.fsync
         z.put_next_entry( f.to_s + '.csv' )
