@@ -334,6 +334,23 @@ class MpxExporter
         line_item = record.line_items.detect { |i| i.variant.product.is_donation? }
         first_donation_code = ( line_item && line_item.variant ) ? line_item.variant.sku : ''
 
+        #Manipulating city, state and zip codes for countries other than US and Canada
+        state = record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name 
+
+        if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
+          city = record.ship_address.city
+          zipcode = record.ship_address.zipcode
+        else
+          #Checking to see if we can get state in the city field without it exceeding impact limitations
+          if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25
+            city = record.ship_address.city + ' ' + record.ship_address.zipcode 
+          else
+            city = record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode
+          end
+          state = ''
+          zipcode = ''
+        end
+
         csv << [
           record.number,
           ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
@@ -358,9 +375,9 @@ class MpxExporter
           record.tax_total,                                                                          # "OrderTax", 
           record.ship_address.full_name,                                                             #"Ship_Name", 
           record.ship_address.address1 + "<BR>" + record.ship_address.address2,                      #"Ship_AddressLines", 
-          record.ship_address.city,                                                                  #"Ship_City", 
-          ( record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name ),                                                            #"Ship_State", 
-          record.ship_address.zipcode,                                                               #"Ship_Zip", 
+          city,                                                                                      #manipulated city, 
+          state,
+          zipcode,                                                                                   #manipulated zip code, 
           record.ship_address.country.name,                                                          #"", 
           ( record.shipments.first ? MpxExporter.map_shipping_mpx_code( record.shipments.first.shipping_method.name ) : '' ),          #"ShipperCode", 
           '',                                                                                        #"BatchType", 
