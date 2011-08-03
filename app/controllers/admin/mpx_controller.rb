@@ -8,26 +8,26 @@ class Admin::MpxController < Admin::BaseController
   end
 
   def export
-    e = MpxExporter.new(params)
+    mpx_exporter = MpxExporter.new(params)
 
     file_name = "mpx_export_#{Time.now.strftime( '%Y%m%d%k%M%S' )}.zip"
-    t = Tempfile.new("mpx_export_#{Time.now.strftime( '%Y%m%d%k%M%S' )}")
+    zip_temp_file = Tempfile.new("mpx_export_#{Time.now.strftime( '%Y%m%d%k%M%S' )}")
 
-    Zip::ZipOutputStream.open(t.path) do |z|
-      [:donor_account_data, :donor_email_data, :gift_master_data, :gift_detail_data, :order_master_data, :order_detail_data].each do |f|
-        filename = f.to_s.titleize.gsub(/ Data/, '').gsub(' ', '_').gsub('Email', 'EMailAddress') #Generates file names as requested
-        tf = Tempfile.new( filename + '.csv' )
-        tf.write( e.send( f ) )
-        tf.fsync
-        z.put_next_entry( f.to_s + '.csv' )
-        z.write IO.read( tf.path )
+    Zip::ZipOutputStream.open(zip_temp_file.path) do |zip|
+      [:donor_account_data, :donor_email_data, :gift_master_data, :gift_detail_data, :order_master_data, :order_detail_data].each do |file_to_export|
+        filename = file_to_export.to_s.titleize.gsub(/ Data/, '').gsub(' ', '_').gsub('Email', 'EMailAddress') #Generates file names as requested
+        csv_temp_file = Tempfile.new( filename + '.csv' )
+        csv_temp_file.write( mpx_exporter.send( file_to_export ) )
+        csv_temp_file.fsync
+        zip.put_next_entry( file_to_export.to_s + '.csv' )
+        zip.write IO.read( csv_temp_file.path )
       end
     end
 
-    send_file t.path, :type => 'application/zip',
+    send_file zip_temp_file.path, :type => 'application/zip',
                            :disposition => 'attachment',
                            :filename => file_name
-    t.close
+    zip_temp_file.close
     
 
     
@@ -46,13 +46,13 @@ class Admin::MpxController < Admin::BaseController
 
 
     
-    if @test_output = e.export
-      flash[:notice] = "Exported Successfully!"
-    else
-      flash[:error]  = "There was a problem exporting the data:\n" + e.errors.join( "\n" )
-    end
+    # if @test_output = e.export
+      # flash[:notice] = "Exported Successfully!"
+    # else
+      # flash[:error]  = "There was a problem exporting the data:\n" + e.errors.join( "\n" )
+    # end
 
-    render 'show'
+    # render 'show'
   end
 
 end
