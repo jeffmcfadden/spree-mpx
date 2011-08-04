@@ -18,7 +18,7 @@ class Admin::MpxController < Admin::BaseController
         csv_file_name = file_to_export.to_s.titleize.gsub(/ Data/, '').gsub(' ', '_').gsub('Email', 'EMailAddress') + ".csv" #Generates file names as requested
 
         csv_temp_file = Tempfile.new(csv_file_name)
-        csv_temp_file.write(mpx_exporter.send(file_to_export))
+        csv_temp_file.write(mpx_exporter.send(file_to_export).force_encoding('utf-8'))
         csv_temp_file.fsync
 
         zip.put_next_entry(csv_file_name)
