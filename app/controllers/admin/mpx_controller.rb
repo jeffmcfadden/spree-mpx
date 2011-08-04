@@ -31,31 +31,6 @@ class Admin::MpxController < Admin::BaseController
     send_file zip_temp_file.path, :filename => zip_file_name, :type => 'application/zip', :disposition => 'attachment'
                            
     zip_temp_file.close
-    
-
-    
-    #@test_data =  donor_account_data        + "\n"
-    #@test_data += donor_email_data          + "\n"
-    #@test_data += gift_master_data          + "\n"
-    #@test_data += gift_detail_data          + "\n"
-    #@test_data += order_master_data         + "\n"
-    #@test_data += order_detail_data         + "\n"
-
-    #@errors += ["Something went wrong"] #test
-    #return @test_data
-    
-    return
-    
-
-
-    
-    # if @test_output = e.export
-      # flash[:notice] = "Exported Successfully!"
-    # else
-      # flash[:error]  = "There was a problem exporting the data:\n" + e.errors.join( "\n" )
-    # end
-
-    # render 'show'
   end
 
 end
