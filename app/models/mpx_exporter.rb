@@ -70,6 +70,13 @@ class MpxExporter
         if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
           city = record.ship_address.city
           zipcode = record.ship_address.zipcode
+          if record.ship_address.country.iso == "CA"
+            if zipcode.length == 6
+              zipcode = zipcode[0..2] + " " + zipcode[3..5]
+            elsif zipcode[3] == '-'
+              zipcode[3] = ' '
+            end
+          end
         else
           #Checking to see if we can get state in the city field without it exceeding impact limitations
           if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25 || state.blank? 
@@ -358,6 +365,13 @@ class MpxExporter
         if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
           city = record.ship_address.city
           zipcode = record.ship_address.zipcode
+          if record.ship_address.country.iso == "CA"
+            if zipcode.length == 6
+              zipcode = zipcode[0..2] + " " + zipcode[3..5]
+            elsif zipcode[3] == '-'
+              zipcode[3] = ' '
+            end
+          end
         else
           #Checking to see if we can get state in the city field without it exceeding impact limitations
           if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25 || state.blank? 
