@@ -63,6 +63,24 @@ class MpxExporter
 
       deduped_records = {}
       @records.each do |record|
+
+        #Manipulating city, state and zip codes for countries other than US and Canada
+        state = record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name 
+
+        if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
+          city = record.ship_address.city
+          zipcode = record.ship_address.zipcode
+        else
+          #Checking to see if we can get state in the city field without it exceeding impact limitations
+          if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25 || state.blank? 
+            city = record.ship_address.city + ' ' + record.ship_address.zipcode 
+          else
+            city = record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode
+          end
+          state = ''
+          zipcode = ''
+        end
+
         this_row = [
           '',                                                                             # Always ''
           ( record.user.nil? || record.user.has_role?( 'staff' ) ) ? record.email : record.user.id,  # User.id unless There is no user or it's a staff user, then email
@@ -74,9 +92,9 @@ class MpxExporter
           '',                                                                             # Always ''
           record.bill_address.organization,
           record.bill_address.address1 + "<BR>" + record.bill_address.address2,
-          record.bill_address.city,
-          ( record.bill_address.state ? record.bill_address.state.abbr : record.bill_address.state_name ),
-          record.bill_address.zipcode,
+          city,
+          state,
+          zipcode,
           '',                                                                             # Always ''
           record.bill_address.country.name,
           record.completed_at.strftime( "%Y-%m-%d %k:%M:%S" ),
@@ -342,7 +360,7 @@ class MpxExporter
           zipcode = record.ship_address.zipcode
         else
           #Checking to see if we can get state in the city field without it exceeding impact limitations
-          if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25
+          if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25 || state.blank? 
             city = record.ship_address.city + ' ' + record.ship_address.zipcode 
           else
             city = record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode
