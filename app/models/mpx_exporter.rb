@@ -65,12 +65,12 @@ class MpxExporter
       @records.each do |record|
 
         #Manipulating city, state and zip codes for countries other than US and Canada
-        state = record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name 
+        state = record.bill_address.state ? record.bill_address.state.abbr : record.bill_address.state_name 
 
-        if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
-          city = record.ship_address.city
-          zipcode = record.ship_address.zipcode
-          if record.ship_address.country.iso == "CA"
+        if record.bill_address.country.iso = "US" || record.bill_address.country.iso = "CA"
+          city = record.bill_address.city
+          zipcode = record.bill_address.zipcode
+          if record.bill_address.country.iso == "CA"
             if zipcode.length == 6
               zipcode = zipcode[0..2] + " " + zipcode[3..5]
             elsif zipcode[3] == '-'
@@ -79,10 +79,10 @@ class MpxExporter
           end
         else
           #Checking to see if we can get state in the city field without it exceeding impact limitations
-          if (record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode).length > 25 || state.blank? 
-            city = record.ship_address.city + ' ' + record.ship_address.zipcode 
+          if (record.bill_address.city + ' ' + state + ' ' + record.bill_address.zipcode).length > 25 || state.blank? 
+            city = record.bill_address.city + ' ' + record.bill_address.zipcode 
           else
-            city = record.ship_address.city + ' ' + state + ' ' + record.ship_address.zipcode
+            city = record.bill_address.city + ' ' + state + ' ' + record.bill_address.zipcode
           end
           state = ''
           zipcode = ''
