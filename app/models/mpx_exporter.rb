@@ -486,15 +486,22 @@ class MpxExporter
     csv_string = CSV.generate( { :force_quotes => true } ) do |csv|
       csv << [ "lnkOrdRef", "ProdCode", "PriceCode", "Price", "PurQty", "FreeQty", "Tax", "SecondTax", "Taxable" ]
 
+      
       @records.each do |order|
         order.line_items.each do |line_item|
           #Only non-donation items here
-          next if line_item.variant.product.is_donation? || line_item.quantity < 1
+          next if (line_item.variant.product.is_donation? && !line_item.variant.product.is_caselot_special?) || line_item.quantity < 1
+
+          if line_itme.variant.product.is_caselot_special? 
+            price = '0.00'
+          else
+            price = sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ), #Changing because amount takes into account the volume discount. line_item.price
+          end
           csv << [
             order.number,
             line_item.variant.sku,
             'ST',
-            sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ), #Changing because amount takes into account the volume discount. line_item.price,
+            price,
             line_item.quantity,
             '',
             0, 
