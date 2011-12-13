@@ -492,7 +492,7 @@ class MpxExporter
           #Only non-donation items here
           next if line_item.variant.product.is_donation? || line_item.quantity < 1
 
-          if line_itme.variant.product.is_caselot_special? 
+          if line_item.variant.product.is_caselot_special? 
             price = '0.00'
           else
             price = sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ) #Changing because amount takes into account the volume discount. line_item.price
