@@ -230,10 +230,10 @@ class MpxExporter
       @records.each do |record|
         #We only process orders here where the entire order is made up of
         #donations
-        if record.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
+        if record.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation_for_mpx? }
 
           #This might be redundant now
-          donations_total = record.line_items.inject(0) {|sum, i| ( i.variant.product.is_donation? ) ? ( sum + i.price ) : 0  }
+          donations_total = record.line_items.inject(0) {|sum, i| ( i.variant.product.is_donation_for_mpx? ) ? ( sum + i.price ) : 0  }
 
           csv << [
             record.number,
@@ -306,11 +306,11 @@ class MpxExporter
       @records.each do |order|
         #We only process orders here where the entire order is made up of
         #donations
-        if order.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation? }
+        if order.line_items.all? { |line_item| line_item.variant && line_item.variant.product.is_donation_for_mpx? }
         
           order.line_items.each do |record|
             #This condition is probably redundant now
-            if record.variant && record.variant.product.is_donation?
+            if record.variant && record.variant.product.is_donation_for_mpx?
               csv << [
                 order.number,
                 record.price,
@@ -349,10 +349,10 @@ class MpxExporter
 
       @records.each do |record|
         #Skip if we have a record with no line items, or one that's only donation(s)
-        next if record.line_items.count == 0 || record.line_items.all? { |line_item| line_item.variant.product.is_donation? }
+        next if record.line_items.count == 0 || record.line_items.all? { |line_item| line_item.variant.product.is_donation_for_mpx? }
         
         #mpx wants the code of the first donation in the order.
-        line_item = record.line_items.detect { |i| i.variant.product.is_donation? }
+        line_item = record.line_items.detect { |i| i.variant.product.is_donation_for_mpx? }
         first_donation_code = ( line_item && line_item.variant ) ? line_item.variant.sku : ''
 
         #Manipulating city, state and zip codes for countries other than US and Canada
@@ -490,7 +490,7 @@ class MpxExporter
       @records.each do |order|
         order.line_items.each do |line_item|
           #Only non-donation items here
-          next if (line_item.variant.product.is_donation? && !line_item.variant.product.is_caselot_special?) || line_item.quantity < 1
+          next if (line_item.variant.product.is_donation? || line_item.quantity < 1
 
           if line_itme.variant.product.is_caselot_special? 
             price = '0.00'
