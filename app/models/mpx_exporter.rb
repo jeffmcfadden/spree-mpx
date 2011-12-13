@@ -495,8 +495,9 @@ class MpxExporter
           if line_itme.variant.product.is_caselot_special? 
             price = '0.00'
           else
-            price = sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ), #Changing because amount takes into account the volume discount. line_item.price
+            price = sprintf( "%0.2f", ( line_item.amount / line_item.quantity ) ) #Changing because amount takes into account the volume discount. line_item.price
           end
+
           csv << [
             order.number,
             line_item.variant.sku,
