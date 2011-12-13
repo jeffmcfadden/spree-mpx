@@ -490,7 +490,7 @@ class MpxExporter
       @records.each do |order|
         order.line_items.each do |line_item|
           #Only non-donation items here
-          next if (line_item.variant.product.is_donation? || line_item.quantity < 1
+          next if line_item.variant.product.is_donation? || line_item.quantity < 1
 
           if line_itme.variant.product.is_caselot_special? 
             price = '0.00'
