@@ -19,10 +19,6 @@ class MpxExporter
     @records = Order.complete.where( [ 'completed_at >= ? AND completed_at < ?', @start_date, @end_date ] )
   end
 
-  def export
-    #Doing this from the controller now.
-  end
-
   def self.map_payment_type( new )
     case new
       when 'Check'
