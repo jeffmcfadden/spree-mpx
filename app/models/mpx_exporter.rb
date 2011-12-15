@@ -349,7 +349,7 @@ class MpxExporter
 
       @records.each do |record|
         #Skip if we have a record with no line items, or one that's only donation(s)
-        next if record.line_items.count == 0 || record.line_items.all? { |line_item| line_item.variant.product.is_donation_for_mpx? }
+        next if record.line_items.count == 0 || record.line_items.all? { |line_item| line_item.variant.product.is_donation? }
         
         #mpx wants the code of the first donation in the order.
         line_item = record.line_items.detect { |i| i.variant.product.is_donation_for_mpx? }
