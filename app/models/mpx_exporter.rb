@@ -315,7 +315,7 @@ class MpxExporter
                 order.number,
                 record.price,
                 'WM',
-                record.variant.sku,                                                                        # Code
+                record.variant.gift_fund_id,                                                               # Code
                 '',                                                                                        # Always ''
                 '',                                                                                        # Always ''
                 ''                                                                                         # Always ''
@@ -353,7 +353,7 @@ class MpxExporter
         
         #mpx wants the code of the first donation in the order.
         line_item = record.line_items.detect { |i| i.variant.product.is_donation_for_mpx? }
-        first_donation_code = ( line_item && line_item.variant ) ? line_item.variant.sku : ''
+        first_donation_code = ( line_item && line_item.variant ) ? line_item.variant.gift_fund_id : ''
 
         #Manipulating city, state and zip codes for countries other than US and Canada
         state = record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name 
