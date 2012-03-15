@@ -63,7 +63,7 @@ class MpxExporter
         #Manipulating city, state and zip codes for countries other than US and Canada
         state = record.bill_address.state ? record.bill_address.state.abbr : record.bill_address.state_name 
 
-        if record.bill_address.country.iso = "US" || record.bill_address.country.iso = "CA"
+        if record.bill_address.country.iso == "US" || record.bill_address.country.iso == "CA"
           city = record.bill_address.city
           zipcode = record.bill_address.zipcode
           if record.bill_address.country.iso == "CA"
@@ -358,7 +358,7 @@ class MpxExporter
         #Manipulating city, state and zip codes for countries other than US and Canada
         state = record.ship_address.state ? record.ship_address.state.abbr : record.ship_address.state_name 
 
-        if record.ship_address.country.iso = "US" || record.ship_address.country.iso = "CA"
+        if record.ship_address.country.iso == "US" || record.ship_address.country.iso == "CA"
           city = record.ship_address.city
           zipcode = record.ship_address.zipcode
           if record.ship_address.country.iso == "CA"
